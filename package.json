@@ -4,13 +4,13 @@
   "description": "Local dev proxy that routes appname.localhost to your dev servers",
   "author": "Hiren Dhola",
   "license": "BSL-1.1",
-  "homepage": "https://github.com/yourusername/dgate",
+  "homepage": "https://github.com/hirendhola/dgate",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/dgate.git"
+    "url": "https://github.com/hirendhola/dgate.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/dgate/issues"
+    "url": "https://github.com/hirendhola/dgate/issues"
   },
   "bin": {
     "dgate": "./dist/dgate"

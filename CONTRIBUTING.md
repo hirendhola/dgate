@@ -3,7 +3,7 @@
 ## Setup
 
 ```bash
-git clone https://github.com/yourusername/dgate
+git clone https://github.com/hirendhola/dgate
 cd dgate
 bun install
 bun index.ts --help

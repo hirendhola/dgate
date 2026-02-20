@@ -30,7 +30,7 @@ npm install -g dgate
 bun add -g dgate
 ```
 
-Or download a binary from [Releases](https://github.com/yourusername/dgate/releases) — no Node or Bun required.
+Or download a binary from [Releases](https://github.com/hirendhola/dgate/releases) — no Node or Bun required.
 
 ---
 
@@ -111,7 +111,7 @@ MIT — free to use in personal and commercial projects. No permission needed.
 PRs welcome. Open an issue first for big changes.
 
 ```bash
-git clone https://github.com/yourusername/dgate
+git clone https://github.com/hirendhola/dgate
 cd dgate
 bun install
 bun index.ts --help
