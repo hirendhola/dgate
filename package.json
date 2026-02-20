@@ -1,0 +1,35 @@
+{
+  "name": "dgate",
+  "version": "0.1.0",
+  "description": "Local dev proxy that routes appname.localhost to your dev servers",
+  "author": "Hiren Dhola",
+  "license": "BSL-1.1",
+  "homepage": "https://github.com/yourusername/dgate",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/dgate.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/dgate/issues"
+  },
+  "bin": {
+    "dgate": "./dist/dgate"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build:win": "bun build ./index.ts --compile --target=bun-windows-x64 --outfile dist/dgate-win.exe",
+    "build:mac": "bun build ./index.ts --compile --target=bun-darwin-arm64 --outfile dist/dgate-mac-arm",
+    "build:mac-x64": "bun build ./index.ts --compile --target=bun-darwin-x64 --outfile dist/dgate-mac-x64",
+    "build:linux": "bun build ./index.ts --compile --target=bun-linux-x64 --outfile dist/dgate-linux",
+    "build:all": "bun run build:win && bun run build:mac && bun run build:mac-x64 && bun run build:linux",
+    "dev": "bun run index.ts"
+  },
+  "devDependencies": {
+    "bun-types": "latest"
+  },
+  "dependencies": {
+    "cac": "^6.7.14"
+  }
+}
