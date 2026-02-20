@@ -3,7 +3,10 @@ name: Release
 on:
   push:
     tags:
-      - "v*" 
+      - "v*"
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -20,8 +23,14 @@ jobs:
       - name: Install dependencies
         run: bun install
 
+      - name: Create dist folder
+        run: mkdir -p dist
+
       - name: Build all platforms
         run: bun run build:all
+
+      - name: List dist folder
+        run: ls -la dist/
 
       - name: Upload release binaries
         uses: softprops/action-gh-release@v1
