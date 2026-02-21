@@ -1,6 +1,6 @@
 {
   "name": "portname",
-  "version": "0.1.0",
+"version": "0.2.0",
   "description": "Local dev proxy that routes appname.localhost to your dev servers",
   "author": "Hiren Dhola",
   "license": "MIT",

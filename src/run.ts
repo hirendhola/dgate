@@ -3,6 +3,7 @@ import { detect } from "./detect";
 import { patch, unpatch } from "./patcher";
 import { register, unregister } from "./registry";
 import { isRunning, LOG_FILE } from "./daemon";
+import { findFreePort } from "./port";
 
 interface RunOptions {
   name?: string;
@@ -14,7 +15,11 @@ export async function run(script: string, options: RunOptions = {}) {
   const cwd = options.cwd ?? process.cwd();
   const { framework, defaultPort, packageManager } = detect(cwd);
   const appName = options.name ?? basename(cwd);
-  const port = options.port ?? defaultPort;
+  const port = await findFreePort(options.port ?? defaultPort);
+
+  if (port !== (options.port ?? defaultPort)) {
+    console.log(`⚠ Port ${options.port ?? defaultPort} in use → using ${port}`);
+  }
 
   if (!isRunning()) {
     console.log("↑ Starting portname daemon...");
@@ -33,8 +38,9 @@ export async function run(script: string, options: RunOptions = {}) {
     console.log(`✓ Auto-configured ${framework} for portname`);
   }
 
-  console.log(`\n✓ ${appName} → http://${appName}.localhost:1999\n`);
-
+  console.log(`\n✓ ${appName} → http://${appName}.localhost:1999`);
+  console.log(`  running on port ${port}\n`);
+  
   const cmd =
     packageManager === "bun"
       ? ["bun", "run", script]
