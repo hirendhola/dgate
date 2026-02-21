@@ -1,37 +1,65 @@
 import { join } from "path";
+import { writeFileSync } from "fs";
 import { cac } from "cac";
 import { register, unregister, list } from "./src/registry";
-import { stopDaemon, status, isRunning, LOG_FILE } from "./src/daemon";
+import {
+  stopDaemon,
+  status,
+  isRunning,
+  LOG_FILE,
+  PID_FILE,
+} from "./src/daemon";
 import { run } from "./src/run";
+
+if (Bun.argv[2] === "__proxy") {
+  const { startProxy } = await import("./src/proxy");
+  startProxy();
+  process.exit = () => process.exit(0); // prevent accidental exits
+}
+
+process.on("uncaughtException", (err) => {
+  console.error(`✗ Error: ${err.message}`);
+  process.exit(1);
+});
+
+process.on("unhandledRejection", (reason) => {
+  const msg = reason instanceof Error ? reason.message : String(reason);
+  console.error(`✗ Error: ${msg}`);
+  process.exit(1);
+});
 
 const cli = cac("dgate");
 
+// ─── start
 cli.command("start", "Start the proxy daemon").action(() => {
   if (isRunning()) {
     console.log("dgate is already running. Use: dgate status");
     process.exit(0);
   }
-  const proxyPath = join(import.meta.dir, "src", "proxy.ts");
-  const proc = Bun.spawn(["bun", proxyPath], {
+
+  // process.execPath = path to current binary (works compiled or via bun)
+  const proc = Bun.spawn([process.execPath, "__proxy"], {
     stdout: Bun.file(LOG_FILE),
     stderr: Bun.file(LOG_FILE),
     stdin: null,
-    cwd: import.meta.dir,
   });
+
+  writeFileSync(PID_FILE, proc.pid.toString());
   console.log(`✓ dgate started (pid ${proc.pid}) → http://*.localhost:1999`);
   console.log(`  logs: ${LOG_FILE}`);
 });
 
+// ─── stop
 cli.command("stop", "Stop the proxy daemon").action(() => stopDaemon());
 
-cli
-  .command("status", "Show daemon status and registered apps")
-  .action(() => status());
+// ─── status
+cli.command("status", "Show daemon status").action(() => status());
 
+// ─── run
 cli
   .command("run <script>", "Run a dev server with dgate proxy")
   .option("--name <name>", "App name (defaults to folder name)")
-  .option("--port <port>", "Port override (defaults to framework default)")
+  .option("--port <port>", "Port override")
   .action(async (script: string, options: { name?: string; port?: string }) => {
     await run(script, {
       name: options.name,
@@ -39,24 +67,28 @@ cli
     });
   });
 
+// ─── register
 cli
   .command("register <name> <port>", "Manually register an app")
   .action(async (name: string, port: string) => {
     const parsed = parseInt(port);
     if (isNaN(parsed)) {
-      console.error(`Invalid port: "${port}"`);
+      console.error(`✗ Invalid port: "${port}"`);
       process.exit(1);
     }
     await register(name, parsed);
     console.log(`  Access at: http://${name}.localhost:1999`);
   });
 
+// ─── unregister
 cli
   .command("unregister <name>", "Remove a registered app")
   .action(async (name: string) => await unregister(name));
 
+// ─── list
 cli.command("list", "List all registered apps").action(() => list());
 
+// ─── open
 cli
   .command("open <name>", "Open an app in the browser")
   .action((name: string) => {
